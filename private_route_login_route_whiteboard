@@ -1,0 +1,83 @@
+// PrivateRoute.tsx
+import React from 'react';
+import { Route, Redirect } from 'react-router-dom';
+
+const PrivateRoute = ({ component: Component, ...rest }: any) => (
+  <Route
+    {...rest}
+    render={(props) =>
+      localStorage.getItem('token') ? (
+        <Component {...props} />
+      ) : (
+        <Redirect to="/login" />
+      )
+    }
+  />
+);
+
+export default PrivateRoute;
+
+// Login.tsx
+import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
+
+const Login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const history = useHistory();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Call API to authenticate user
+    // If successful, store token in localStorage and redirect to whiteboard
+    localStorage.setItem('token', 'your_token_here');
+    history.push('/whiteboard');
+  };
+
+  return (
+    <div>
+      <h2>Login</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  );
+};
+
+export default Login;
+
+// Whiteboard.tsx
+import React, { useRef, useEffect } from 'react';
+import { fabric } from 'fabric';
+import './Whiteboard.css';
+
+const Whiteboard = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = new fabric.Canvas(canvasRef.current!);
+    canvas.isDrawingMode = true;
+    canvas.freeDrawingBrush.color = 'black';
+    canvas.freeDrawingBrush.width = 5;
+  }, []);
+
+  return (
+    <div className="whiteboard-container">
+      <canvas ref={canvasRef} className="whiteboard" />
+    </div>
+  );
+};
+
+export default Whiteboard;
